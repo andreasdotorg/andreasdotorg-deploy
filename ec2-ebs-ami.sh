@@ -101,4 +101,10 @@ echo "To keep an eye on it:"
 echo "ec2-get-console-output --region $REGION $INSTANCE_ID"
  
 ec2-detach-volume --region $REGION $VOLUME_ID
+
+[ -e ${EBS_DEVICE} ] && sleep 2
+[ -e ${EBS_DEVICE} ] && sleep 2
+[ -e ${EBS_DEVICE} ] && sleep 2
+ 
+
 ec2-delete-volume --region $REGION $VOLUME_ID
