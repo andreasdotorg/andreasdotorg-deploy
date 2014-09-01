@@ -94,7 +94,7 @@ INSTANCE_ID=`ec2-run-instances $AMI_ID  -t t1.micro --region ${REGION}|grep ^INS
  
 [ "$INSTANCE_ID" = "" ] && fail "Couldn't start an instance with AMI ID $AMI_ID ."
 
-ec2-associate-address -i $INSTANCE_ID 54.77.188.93
+ec2-associate-address --region $REGION -i $INSTANCE_ID 54.77.188.93
  
 echo "Successfully made an instance; it should be online soon."
 echo "To keep an eye on it:"
