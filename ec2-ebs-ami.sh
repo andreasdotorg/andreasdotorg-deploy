@@ -51,12 +51,12 @@ ec2-attach-volume $VOLUME_ID -i $HOST_INSTANCE_ID -d $EBS_DEVICE --region $REGIO
 # KERNEL is ec2-describe-images -o amazon --region ${REGION} -F "manifest-location=*pv-grub-hd0*" -F "architecture=x86_64" | tail -1 | cut -f2
 KERNEL_ID=`ec2-describe-images -o amazon --region ${REGION} -F "manifest-location=*pv-grub-hd0*" -F "architecture=x86_64"| tail -1 | cut -f2`
 IMG=${NAME}.img
-MNT=/mnt
+MNT=/mnt2
 SUDO=sudo
  
 ${SUDO} mkfs.ext2 $EBS_DEVICE
  
-#${SUDO} mkdir -p /mnt/mirage
+#${SUDO} mkdir -p /mnt2/mirage
 #rm -f ${IMG}
 #dd if=/dev/zero of=${IMG} bs=1M count=20
 #${SUDO} mke2fs -F -j ${IMG}
@@ -93,6 +93,8 @@ AMI_ID=`ec2-register -n $NAME --snapshot $SNAPSHOT_ID --kernel $KERNEL_ID --regi
 INSTANCE_ID=`ec2-run-instances $AMI_ID  -t t1.micro --region ${REGION}|grep ^INSTANCE|cut -f2`
  
 [ "$INSTANCE_ID" = "" ] && fail "Couldn't start an instance with AMI ID $AMI_ID ."
+
+ec2-associate-address -i $INSTANCE_ID 54.77.188.93
  
 echo "Successfully made an instance; it should be online soon."
 echo "To keep an eye on it:"
