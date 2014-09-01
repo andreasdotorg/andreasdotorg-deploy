@@ -12,14 +12,6 @@ fail() {
 	exit 1	
 }
  
-if [ ! -e "$1" ]; then
-  echo Usage: $0 kernel.xen
-  echo This script will create an EBS-backed AMI and launch a t1.micro instance for the Xen kernel you pass as the first argument.
-  echo This script is meant to be run on an EC2 instance, and will fail if run elsewhere.
-  echo Remember to set AWS_ACCESS_KEY and AWS_SECRET_KEY.
-  exit 1
-fi
- 
 [ "$NAME" = "" ] && NAME=mirage-`date -u +%s`
  
 # these work but are quite slow;
@@ -79,7 +71,7 @@ echo " root (hd0)" >> menu.lst
 echo " kernel /boot/mirage-os.gz" >> menu.lst
 ${SUDO} mv menu.lst ${MNT}/boot/grub/menu.lst
  
-${SUDO} sh -c "gzip -c $1 > ${MNT}/boot/mirage-os.gz"
+${SUDO} sh -c "cp xen/`cat xen/latest`/mir-www.gz ${MNT}/boot/mirage-os.gz"
 ${SUDO} umount -d ${MNT}
  
 SNAPSHOT_ID=`ec2-create-snapshot --region $REGION $VOLUME_ID|cut -f2`
