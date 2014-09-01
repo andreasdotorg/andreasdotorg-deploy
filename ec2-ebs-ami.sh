@@ -71,7 +71,7 @@ echo " root (hd0)" >> menu.lst
 echo " kernel /boot/mirage-os.gz" >> menu.lst
 ${SUDO} mv menu.lst ${MNT}/boot/grub/menu.lst
  
-${SUDO} sh -c "cp xen/`cat xen/latest`/mir-www.gz ${MNT}/boot/mirage-os.gz"
+${SUDO} sh -c "cp xen/`cat xen/latest`/mir-www.xen.gz ${MNT}/boot/mirage-os.gz"
 ${SUDO} umount -d ${MNT}
  
 SNAPSHOT_ID=`ec2-create-snapshot --region $REGION $VOLUME_ID|cut -f2`
