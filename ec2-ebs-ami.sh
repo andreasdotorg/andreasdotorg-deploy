@@ -73,6 +73,8 @@ ${SUDO} mv menu.lst ${MNT}/boot/grub/menu.lst
  
 ${SUDO} sh -c "cp xen/`cat xen/latest`/mir-www.xen.gz ${MNT}/boot/mirage-os.gz"
 ${SUDO} umount -d ${MNT}
+
+ec2-detach-volume --region $REGION $VOLUME_ID
  
 SNAPSHOT_ID=`ec2-create-snapshot --region $REGION $VOLUME_ID|cut -f2`
 [ "$SNAPSHOT_ID" = "" ] && fail "Couldn't make a snapshot of the EBS volume."
@@ -89,22 +91,17 @@ AMI_ID=`ec2-register -n $NAME --snapshot $SNAPSHOT_ID --kernel $KERNEL_ID --regi
 [ "$AMI_ID" = "" ] && fail "Couldn't make an AMI from the snapshot $SNAPSHOT_ID and the kernel ID $KERNEL_ID ."
  
 #now make an instance running that.
-#TODO: should be able to specify security group here.
-INSTANCE_ID=`ec2-run-instances $AMI_ID  -t t1.micro --region ${REGION}|grep ^INSTANCE|cut -f2`
+INSTANCE_ID=`ec2-run-instances $AMI_ID  -t t1.micro --region ${REGION}  -g sg-5b7ddd3e --associate-public-ip-address no|grep ^INSTANCE|cut -f2`
  
 [ "$INSTANCE_ID" = "" ] && fail "Couldn't start an instance with AMI ID $AMI_ID ."
 
-ec2-associate-address --region $REGION -i $INSTANCE_ID 54.77.188.93
- 
 echo "Successfully made an instance; it should be online soon."
 echo "To keep an eye on it:"
 echo "ec2-get-console-output --region $REGION $INSTANCE_ID"
  
-ec2-detach-volume --region $REGION $VOLUME_ID
-
-[ -e ${EBS_DEVICE} ] && sleep 2
-[ -e ${EBS_DEVICE} ] && sleep 2
-[ -e ${EBS_DEVICE} ] && sleep 2
- 
-
 ec2-delete-volume --region $REGION $VOLUME_ID
+
+sleep 60
+
+ec2-associate-address --region $REGION -i $INSTANCE_ID 54.77.188.93
+ 
